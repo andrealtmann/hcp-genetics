@@ -1,5 +1,6 @@
 library(data.table)
 
+#currently works only for 50 and 300
 nparc <- 300
 
 data.path <- paste("/Volumes/My Passport/HCP/HCP_PTN1200/netmats/3T_HCP1200_MSMAll_d", nparc, "_ts2/", sep="")
@@ -41,8 +42,8 @@ message("scaling features")
 mydata.scale <- apply(mydata, 2, scale)
 rownames(mydata.scale) <- rownames(mydata)
 
-
 ofname <- paste("../data/netmats1_", nparc, ".RData",sep="")
-save(subject.info, ethn.info, nparc, mydata, mydata.scale, file=ofname)
+message("storing in: ", ofname)
+save(subject.info, ethn.info, nparc, mydata.scale, file=ofname)
 
 ### END ###
