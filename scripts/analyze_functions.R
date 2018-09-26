@@ -1,4 +1,29 @@
 
+getFamCVfold <- function(x, nfold, fam){
+    #this generates CV folds that ensure that all family members are in the same fold.
+    #in order to avoid biases.
+
+    avail.fam <- unique(paste(fam[,1]))
+    nsize <- ceiling(nrow(x)/nfold)
+    cv.idx <- rep(nfold, nrow(x))
+
+    i <- 1
+    while (i < nfold){
+        i.cnt <- sum(cv.idx == i)
+        while (i.cnt < nsize){
+            new.fam <- sample(avail.fam,1)
+            sjbid <- paste(fam[fam[,1] == new.fam,2])
+            idx <- which(is.element(rownames(x),sjbid))
+            cv.idx[idx] <- i
+            avail.fam <- setdiff(avail.fam, new.fam)
+            i.cnt <- sum(cv.idx == i)
+        }
+        i <- i + 1
+    }
+    return(cv.idx)
+}
+
+
 getCVfold <- function(x, nfold){
     avail <- 1:nrow(x)
     nsize <- ceiling(nrow(x)/nfold)
