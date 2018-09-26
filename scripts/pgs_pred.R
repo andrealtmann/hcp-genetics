@@ -27,6 +27,7 @@ ofname <- paste("../results/", paste(chip, nparc, pgs, bstring, pstring, sep="_"
 
 rdata.fname <- paste("../data/netmats1_", nparc, ".RData", sep="")
 pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score",sep="")
+fam.fname <- paste("../data/MEGA_Chip.fam")
 
 message("loading ", pgs, " PGS")
 pgs.info <- read.table(pgs.fname, head=T)
@@ -56,6 +57,11 @@ names(pgs2) <- keep.ceu
 #outcome
 Y <- pgs2[rownames(mydata.scale)]
 
+fam.info <- read.table(fam.fname)
+myfam.map <- fam.info[,1:2]
+rownames(myfam.map) <- myfam.map[,2]
+myfam.use <- myfam.map[rownames(mydata.scale),]
+
 if (do.binary){
     #binarize the outcome and do classification
     ccc <- quantile(Y,c(0.25,0.75),na.rm=T)
@@ -67,6 +73,7 @@ if (do.binary){
     excl <- is.na(Y3)
     mydata.scale2 <- mydata.scale[!excl,]
     Y2 <- Y3[!excl]
+    myfam.use2 <- myfam.use[!excl,]
 
     #rndm
     #Y2 <- sample(Y2, length(Y2), replace=F)
@@ -77,7 +84,9 @@ if (do.binary){
     plot(abc)
 
     #nested CV
-    mycv      <- getCVfold(mydata.scale2, 10)
+    #mycv      <- getCVfold(mydata.scale2, 10)
+    #nested CV with outer fold being family aware!
+    mycv      <- getFamCVfold(mydata.scale2, 10, myfam.use2)
     system.time(nested.cv <- doubleCV(Y2, mydata.scale2, myfold=mycv))
 } else {
     #do regression with the full dataset
@@ -85,6 +94,7 @@ if (do.binary){
     excl <- is.na(Y)
     mydata.scale2 <- mydata.scale[!excl,]
     Y2 <- Y[!excl]
+    myfam.use2 <- myfam.use[!excl,]
 
     #mean 0 and sd 1
     Y2 <- scale(Y2)
@@ -94,7 +104,8 @@ if (do.binary){
     #plot(abc)
 
     #nested CV
-    mycv      <- getCVfold(mydata.scale2, 10)
+    #mycv      <- getCVfold(mydata.scale2, 10)
+    mycv      <- getFamCVfold(mydata.scale2, 10, myfam.use2)
     nested.cv <- doubleCV(Y2, mydata.scale2, myfold=mycv, fam="gaussian", measure="mse", lop="min")
 
     rtr  <- cor(unlist(nested.cv$labels),  unlist(nested.cv$prediction))
