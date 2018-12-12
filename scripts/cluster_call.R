@@ -22,7 +22,7 @@ for(aa in args){
         if (tok[1] == "--pgs")
             pgs <- tok[2]
         if (tok[1] == "--nperm")
-            nperm <- as.integer(as.tok[2])
+            nperm <- as.integer(tok[2])
     }
 }
 
