@@ -127,6 +127,7 @@ if (do.binary){
           rndperf <- cmp.CV.perf(tmp.cv)
           rndm <- rbind(rndm, rndperf)
           print(rndm)
+          save(abc, mycv, nested.cv, xperf, rndm, file=ofname)
         }
     }
     message("save results to ", ofname)
