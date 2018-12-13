@@ -246,7 +246,7 @@ cmp.CV.perf <- function(cv.list){
 
   fperf <- sapply(1:nfolds, function(fold){
     ppp <- cv.list$prediction[[fold]][,1]
-    print(ppp)
+    #print(ppp)
     lll <- cv.list$labels[[fold]]
     ccc <- cor(ppp,lll)
     #ccc can be NA if prediction is constant, i.e., no features selected
