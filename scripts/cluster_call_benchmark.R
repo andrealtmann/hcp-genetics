@@ -28,7 +28,7 @@ for(aa in args){
 }
 
 message("options:")
-for(var in c("nparc","chip","pgs","cvmeth"))
+for(var in c("nparc","chip","pgs","cv.method"))
   message(var, ": ", get(var))
 
 source("pgs_pred_benchmark.R")
