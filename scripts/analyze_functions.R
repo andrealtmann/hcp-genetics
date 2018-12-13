@@ -148,11 +148,11 @@ doubleCV.SGL <- function(y, x, grp, nfold, fam="logit", alpha=0.5, myfold=c()){
 }
 
 
-log.stability <- function(outc, x, nrep=100, alpha=0.5){
+log.stability <- function(outc, x, nrep=100, alpha=0.5, fraction=0.75){
 
     result <- rep(0, ncol(x))
     samp <- 1:nrow(x)
-    N <- ceiling(0.9 * nrow(x))
+    N <- ceiling(fraction * nrow(x))
     for(j in 1:nrep){
         message(j)
         sidx <- sample(samp, N, replace=T)
@@ -236,4 +236,29 @@ plot.stab <- function(mystab, thresh=0.5){
   idx <- mystab >= thresh
   text(which(idx), mystab[idx], labels=names(mystab)[idx], pos=3)
   abline(h=thresh, col=2, lwd=2, lty=2)
+}
+
+cmp.CV.perf <- function(cv.list){
+
+  #nested.cv$labels),  unlist(nested.cv$prediction
+
+  nfolds <- length(cv.list$labels)
+
+  fperf <- sapply(1:nfolds, function(fold){
+    ppp <- cv.list$prediction[[fold]][,1]
+    print(ppp)
+    lll <- cv.list$labels[[fold]]
+    ccc <- cor(ppp,lll)
+    #ccc can be NA if prediction is constant, i.e., no features selected
+    if (is.na(ccc)){
+      ccc <- 0.0
+    }
+    mmm <- sqrt(mean((ppp - lll)^2))
+    return(c(ccc, mmm))
+  })
+
+
+  mperf <- apply(fperf, 1, mean)
+  names(mperf) <- c("cor","rmse")
+  return(mperf)
 }

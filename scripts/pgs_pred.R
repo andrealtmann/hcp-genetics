@@ -25,7 +25,7 @@ if (nperm > 0)
 
 ofname <- paste("../results/", paste(chip, nparc, pgs, bstring, pstring, sep="_"), ".RData", sep="")
 
-rdata.fname <- paste("../data/netmats1_", nparc, ".RData", sep="")
+rdata.fname <- paste("../data/netmats2_", nparc, ".RData", sep="")
 pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score",sep="")
 fam.fname <- paste("../data/MEGA_Chip.fam")
 
@@ -63,7 +63,7 @@ rownames(myfam.map) <- myfam.map[,2]
 myfam.use <- myfam.map[rownames(mydata.scale),]
 
 if (do.binary){
-    #binarize the outcome and do classification
+    #binarize the outcome and do classification top 25% vs bottom 25%
     ccc <- quantile(Y,c(0.25,0.75),na.rm=T)
     #ccc <- quantile(Y,c(0.49,0.51),na.rm=T)
     Y3 <- rep(NA, length(Y))
@@ -88,6 +88,8 @@ if (do.binary){
     #nested CV with outer fold being family aware!
     mycv      <- getFamCVfold(mydata.scale2, 10, myfam.use2)
     system.time(nested.cv <- doubleCV(Y2, mydata.scale2, myfold=mycv))
+
+    aucs <- unlist(performance(prediction(nested.cv$prediction, nested.cv$labels),'auc')@y.values)
 } else {
     #do regression with the full dataset
 
@@ -108,8 +110,10 @@ if (do.binary){
     mycv      <- getFamCVfold(mydata.scale2, 10, myfam.use2)
     nested.cv <- doubleCV(Y2, mydata.scale2, myfold=mycv, fam="gaussian", measure="mse", lop="min")
 
-    rtr  <- cor(unlist(nested.cv$labels),  unlist(nested.cv$prediction))
-    mstr <- sqrt(mean((unlist(nested.cv$labels) -  unlist(nested.cv$prediction))^2))
+    #rtr  <- cor(unlist(nested.cv$labels),  unlist(nested.cv$prediction))
+    #mstr <- sqrt(mean((unlist(nested.cv$labels) -  unlist(nested.cv$prediction))^2))
+
+    xperf <- cmp.CV.perf(nested.cv)
 
     rndm <- c()
     if (nperm > 0){
@@ -117,14 +121,16 @@ if (do.binary){
           message("rnd", j)
           Yrn <- sample(Y2)
           tmp.cv <- doubleCV(Yrn, mydata.scale2, myfold=mycv, nla=20, fam="gaussian", measure="mse", lop="min")
-          rrn <- cor(unlist(tmp.cv$labels),  unlist(tmp.cv$prediction))
-          rms <- sqrt(mean((unlist(tmp.cv$labels) -  unlist(tmp.cv$prediction))^2))
-          rndm <- rbind(rndm, c(rrn, rms))
+          #rrn <- cor(unlist(tmp.cv$labels),  unlist(tmp.cv$prediction))
+          #rms <- sqrt(mean((unlist(tmp.cv$labels) -  unlist(tmp.cv$prediction))^2))
+          #rndm <- rbind(rndm, c(rrn, rms))
+          rndperf <- cmp.CV.perf(tmp.cv)
+          rndm <- rbind(rndm, rndperf)
           print(rndm)
         }
     }
     message("save results to ", ofname)
-    save(abc, mycv, nested.cv, rtr, mstr, rndm, file=ofname)
+    save(abc, mycv, nested.cv, xperf, rndm, file=ofname)
 }
 
 
