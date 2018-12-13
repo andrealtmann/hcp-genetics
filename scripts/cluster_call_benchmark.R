@@ -6,7 +6,7 @@ pgs   <- ""
 do.binary <- F
 nperm  <- 100
 run_external <- T
-cvmeth <- ""
+cv.method <- ""
 
 ##reading command line parameters
 args = commandArgs(trailingOnly=F)
@@ -23,7 +23,7 @@ for(aa in args){
         #if (tok[1] == "--nperm")
         #    nperm <- as.integer(tok[2])
 	if (tok[1] == "--cv")
-	  cvmeth <- tok[2]
+	  cv.method <- tok[2]
     }
 }
 
