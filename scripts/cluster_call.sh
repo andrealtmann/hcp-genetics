@@ -9,7 +9,8 @@
 
 #pgs="education"
 pgs=$1
+nparc=$2
 
-R --no-save -q < cluster_call.R --pgs=$pgs --nparc=300 --nperm=250
+R --no-save -q < cluster_call.R --pgs=$pgs --nparc=$nparc --nperm=1000
 
 

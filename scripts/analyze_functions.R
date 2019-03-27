@@ -1,4 +1,92 @@
 
+sampleFam <- function(y, fam){
+  #do ramdon sampling but swap across families
+
+  fam[,1] <- paste(fam[,1])
+
+  avail.fam <- table(paste(fam[,1]))
+  #this is a manual hack...
+  avail.swap <- names(avail.fam)
+  yout <- rep(NA, length(y))
+  fout <- rep(NA, length(y))
+  
+  fmsize <- list()
+  for(fs in  sort(unique(avail.fam))){
+    fmsize[[fs]] <- names(which(avail.fam==fs))
+  }
+
+  #swap 6 and 2 random 3s
+  mysix <- fmsize[[6]]
+  A <- which(is.element(fam[,1], mysix))
+  mythrees <- sample(fmsize[[3]],2)
+  B <- which(is.element(fam[,1], mythrees))
+  prm <- sample(1:6,6)
+  yout[A] <- y[B[prm]]
+  yout[B] <- y[A[prm]]
+  fout[A] <- fam[B[prm],1]  
+  fout[B] <- fam[A[prm],1]  
+
+  fmsize[[6]] <- setdiff(fmsize[[6]], mysix)
+  fmsize[[3]] <- setdiff(fmsize[[3]], mythrees)
+
+  #swap 5 and 1 random 3 and 2
+  myfive <- fmsize[[5]]
+  A <- which(is.element(fam[,1], myfive))
+  mythree <- sample(fmsize[[3]],1)
+  mytwo   <- sample(fmsize[[2]],1)
+  B <- which(is.element(fam[,1], c(mythree, mytwo)))
+  prm <- sample(1:5,5)
+  yout[A] <- y[B[prm]]
+  yout[B] <- y[A[prm]]
+  fout[A] <- fam[B[prm],1]  
+  fout[B] <- fam[A[prm],1]  
+  
+  fmsize[[5]] <- setdiff(fmsize[[5]], myfive)
+  fmsize[[3]] <- setdiff(fmsize[[3]], mythree)
+  fmsize[[2]] <- setdiff(fmsize[[2]], mytwo)
+  
+  #permute the 4's
+  swp <- sample(fmsize[[4]])
+  for(x in 1:length(fmsize[[4]])){
+      A <- which(is.element(fam[,1], fmsize[[4]][x]))
+      B <- which(is.element(fam[,1], swp[x]))
+      prm <- sample(1:4,4)
+      yout[A] <- y[B[prm]]
+      fout[A] <- fam[B[prm],1]
+  }
+  fmsize[[4]] <- setdiff(fmsize[[4]], swp)
+
+  #permute the 3's
+  swp <- sample(fmsize[[3]])
+  for(x in 1:length(fmsize[[3]])){
+      A <- which(is.element(fam[,1], fmsize[[3]][x]))
+      B <- which(is.element(fam[,1], swp[x]))
+      prm <- sample(1:3,3)
+      yout[A] <- y[B[prm]]
+      fout[A] <- fam[B[prm],1]
+  }
+
+  #permute the 2's
+  swp <- sample(fmsize[[2]])
+  for(x in 1:length(fmsize[[2]])){
+      A <- which(is.element(fam[,1], fmsize[[2]][x]))
+      B <- which(is.element(fam[,1], swp[x]))
+      prm <- sample(1:2,2)
+      yout[A] <- y[B[prm]]
+      fout[A] <- fam[B[prm],1]
+  }
+
+  #permute the 1's
+  A <- which(is.element(fam[,1], fmsize[[1]]))
+  prm <- sample(A)
+  yout[A] <- y[prm]
+  fout[A] <- fam[prm,1]
+        
+  #return(cbind(yout,fout))
+  return(yout)
+
+}
+
 getFamCVfold <- function(x, nfold, fam){
     #this generates CV folds that ensure that all family members are in the same fold.
     #in order to avoid biases.

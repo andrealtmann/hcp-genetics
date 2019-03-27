@@ -21,12 +21,17 @@ if (do.binary)
 
 pstring <- "noperm"
 if (nperm > 0)
-  pstring <- paste("perm",nperm, sep="")
+  pstring <- paste("FAMperm",nperm, sep="")
 
 ofname <- paste("../results/", paste(chip, nparc, pgs, bstring, pstring, sep="_"), ".RData", sep="")
 
+if (file.exists(ofname)){
+  load(ofname)
+}
+
+
 rdata.fname <- paste("../data/netmats2_", nparc, ".RData", sep="")
-pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score",sep="")
+pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score_residual",sep="")
 fam.fname <- paste("../data/MEGA_Chip.fam")
 
 message("loading ", pgs, " PGS")
@@ -51,6 +56,7 @@ ethn.info <- data.frame(ethn.info, sex)
 keep.ceu  <- rownames(subset(ethn.info, CEU>0.9))
 #keep.ceu  <- rownames(subset(ethn.info, CEU>0.9 & sex=="M"))
 #keep.ceu  <- rownames(subset(ethn.info, CEU>0.9 & sex=="F"))
+keep.ceu <- intersect(keep.ceu, rownames(pgs.info))
 pgs2      <- pgs.info[keep.ceu, "X0.700000"]
 names(pgs2) <- keep.ceu
 
@@ -61,6 +67,8 @@ fam.info <- read.table(fam.fname)
 myfam.map <- fam.info[,1:2]
 rownames(myfam.map) <- myfam.map[,2]
 myfam.use <- myfam.map[rownames(mydata.scale),]
+
+#breakpoint
 
 if (do.binary){
     #binarize the outcome and do classification top 25% vs bottom 25%
@@ -106,8 +114,10 @@ if (do.binary){
     #plot(abc)
 
     #nested CV
-    #mycv      <- getCVfold(mydata.scale2, 10)
-    mycv      <- getFamCVfold(mydata.scale2, 10, myfam.use2)
+    if (!exists("mycv")){
+      #mycv      <- getCVfold(mydata.scale2, 10)
+      mycv      <- getFamCVfold(mydata.scale2, 10, myfam.use2)
+    }
     nested.cv <- doubleCV(Y2, mydata.scale2, myfold=mycv, fam="gaussian", measure="mse", lop="min")
 
     #rtr  <- cor(unlist(nested.cv$labels),  unlist(nested.cv$prediction))
@@ -115,11 +125,20 @@ if (do.binary){
 
     xperf <- cmp.CV.perf(nested.cv)
 
-    rndm <- c()
+    jstart <- 1
+    if (!exists("rndm")){
+      rndm <- c()
+    } else {
+      jstart <- nrow(rndm)
+    }
+
     if (nperm > 0){
-        for(j in 1:nperm){
+        for(j in jstart:nperm){
           message("rnd", j)
-          Yrn <- sample(Y2)
+	  #this should be 'family aware as well'
+          #Yrn <- sample(Y2)
+	  Yrn <- sampleFam(Y2, myfam.use2)
+
           tmp.cv <- doubleCV(Yrn, mydata.scale2, myfold=mycv, nla=20, fam="gaussian", measure="mse", lop="min")
           #rrn <- cor(unlist(tmp.cv$labels),  unlist(tmp.cv$prediction))
           #rms <- sqrt(mean((unlist(tmp.cv$labels) -  unlist(tmp.cv$prediction))^2))

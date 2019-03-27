@@ -9,9 +9,11 @@
 
 #pgs="education"
 pgs=$1
-cvmeth="famaware"
+#cvmeth="famaware"
 #cvmeth="standard"
+cvmeth=$2
+nparc=$3
 
-R --no-save -q < cluster_call_benchmark.R --pgs=$pgs --nparc=300 --cv=$cvmeth
+R --no-save -q < cluster_call_benchmark.R --pgs=$pgs --nparc=$nparc --cv=$cvmeth
 
 

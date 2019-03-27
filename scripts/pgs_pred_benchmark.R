@@ -27,12 +27,12 @@ pstring <- "noperm"
 if (nperm > 0)
   pstring <- paste("perm",nperm, sep="")
 
-ofname <- paste("../results/", paste("benchmark", chip, nparc, pgs, bstring, pstring, sep="_"), ".RData", sep="")
+ofname <- paste("../results/", paste("benchmark", cv.method, chip, nparc, pgs, bstring, pstring, sep="_"), ".RData", sep="")
 
 rdata.fname <- list()
 rdata.fname[[1]] <- paste("../data/netmats1_", nparc, ".RData", sep="")
 rdata.fname[[2]] <- paste("../data/netmats2_", nparc, ".RData", sep="")
-pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score",sep="")
+pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score_residual",sep="")
 fam.fname <- paste("../data/MEGA_Chip.fam")
 
 message("loading ", pgs, " PGS")
@@ -54,6 +54,7 @@ ethn.info <- data.frame(ethn.info, sex)
 keep.ceu  <- rownames(subset(ethn.info, CEU>0.9))
 #keep.ceu  <- rownames(subset(ethn.info, CEU>0.9 & sex=="M"))
 #keep.ceu  <- rownames(subset(ethn.info, CEU>0.9 & sex=="F"))
+keep.ceu <- intersect(keep.ceu, rownames(pgs.info))
 pgs2      <- pgs.info[keep.ceu, "X0.700000"]
 names(pgs2) <- keep.ceu
 
@@ -86,9 +87,12 @@ for(rep in 1:nperm){
   ##fix the cv for runs with nm1 and nm2
   ##this allows for a paired t-test/wilcoxon test
   if (cv.method == "standard"){
+    message("sampling standard folds")
     mycv      <- getCVfold(mydata.scale2, 10)
+
   }
   if (cv.method == "famaware"){
+    message("sampling family-aware folds")
     mycv      <- getFamCVfold(mydata.scale2, 10, myfam.use2)
   }
 

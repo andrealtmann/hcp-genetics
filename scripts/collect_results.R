@@ -1,9 +1,10 @@
 
 
 chip<-"MEGA"
-nparc <- 300
+if (!exists("nparc"))
+  nparc <- 300 
 bstring <- "regress"
-nperm <- 250
+nperm <- 10000
 do.binary <- F
 
 bstring <- "regress"
@@ -12,7 +13,7 @@ if (do.binary)
 if (nperm > 0)
   pstring <- paste("perm",nperm, sep="")
 
-all.pgs <- c("ad","blood_pressure","cad","education","eps","fiq","height","mdd","sz")
+all.pgs <- c("ad","bmi","blood_pressure","cad","education","education2","eps","fiq","height","mdd","sz")
 #just to test the script
 #all.pgs <- c("education")
 
