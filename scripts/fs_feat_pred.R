@@ -10,11 +10,12 @@ source("analyze_functions.R")
 #FS_InterCranial_Vol
 
 if (!exists("run_external")){
-    nparc <- 50
+    nparc <- 100
     #fs_feat <- "FS_L_Hippo_Vol"
     fs_feat <- "FS_InterCranial_Vol"
     #options: both, male, female
-    keep.sex <- "both"
+    #keep.sex <- "both"
+    keep.sex <- "male"
     regress.icv <- F
     do.binary <- F
     nperm  <- 0
@@ -26,11 +27,17 @@ bstring <- "regress"
 if (do.binary)
   bstring <- "classify"
 
+icvstring <- "noICVreg"
+if (regress.icv){
+  icvstring <- "ICVreg"
+}
+
+
 pstring <- "noperm"
 if (nperm > 0)
   pstring <- paste("perm",nperm, sep="")
 
-ofname <- paste("../results/", paste("FS", nparc, fs_feat, bstring, pstring, sep="_"), ".RData", sep="")
+ofname <- paste("../results/", paste("FS", nparc, fs_feat, bstring, keep.sex, icvstring, pstring, sep="_"), ".RData", sep="")
 
 rdata.fname <- paste("../data/netmats2_", nparc, ".RData", sep="")
 fs.fname    <- "../data/unrestricted_hcp_freesurfer.csv"
@@ -150,7 +157,8 @@ if (do.binary){
     if (nperm > 0){
         for(j in 1:nperm){
           message("rnd", j)
-          Yrn <- sample(Y2)
+          #Yrn <- sample(Y2)
+          Yrn <- sampleFam(Y2, myfam.use2)
           tmp.cv <- doubleCV(Yrn, mydata.scale2, myfold=mycv, nla=20, fam="gaussian", measure="mse", lop="min")
           #rrn <- cor(unlist(tmp.cv$labels),  unlist(tmp.cv$prediction))
           #rms <- sqrt(mean((unlist(tmp.cv$labels) -  unlist(tmp.cv$prediction))^2))

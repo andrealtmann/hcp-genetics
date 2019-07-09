@@ -9,11 +9,13 @@ sampleFam <- function(y, fam){
   avail.swap <- names(avail.fam)
   yout <- rep(NA, length(y))
   fout <- rep(NA, length(y))
-  
+
   fmsize <- list()
   for(fs in  sort(unique(avail.fam))){
     fmsize[[fs]] <- names(which(avail.fam==fs))
   }
+
+  if (length(table(avail.fam)) > 5){
 
   #swap 6 and 2 random 3s
   mysix <- fmsize[[6]]
@@ -23,12 +25,12 @@ sampleFam <- function(y, fam){
   prm <- sample(1:6,6)
   yout[A] <- y[B[prm]]
   yout[B] <- y[A[prm]]
-  fout[A] <- fam[B[prm],1]  
-  fout[B] <- fam[A[prm],1]  
+  fout[A] <- fam[B[prm],1]
+  fout[B] <- fam[A[prm],1]
 
   fmsize[[6]] <- setdiff(fmsize[[6]], mysix)
   fmsize[[3]] <- setdiff(fmsize[[3]], mythrees)
-
+}
   #swap 5 and 1 random 3 and 2
   myfive <- fmsize[[5]]
   A <- which(is.element(fam[,1], myfive))
@@ -38,13 +40,13 @@ sampleFam <- function(y, fam){
   prm <- sample(1:5,5)
   yout[A] <- y[B[prm]]
   yout[B] <- y[A[prm]]
-  fout[A] <- fam[B[prm],1]  
-  fout[B] <- fam[A[prm],1]  
-  
+  fout[A] <- fam[B[prm],1]
+  fout[B] <- fam[A[prm],1]
+
   fmsize[[5]] <- setdiff(fmsize[[5]], myfive)
   fmsize[[3]] <- setdiff(fmsize[[3]], mythree)
   fmsize[[2]] <- setdiff(fmsize[[2]], mytwo)
-  
+
   #permute the 4's
   swp <- sample(fmsize[[4]])
   for(x in 1:length(fmsize[[4]])){
@@ -81,7 +83,7 @@ sampleFam <- function(y, fam){
   prm <- sample(A)
   yout[A] <- y[prm]
   fout[A] <- fam[prm,1]
-        
+
   #return(cbind(yout,fout))
   return(yout)
 
