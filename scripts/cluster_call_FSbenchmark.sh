@@ -6,6 +6,8 @@
 #$ -l tmem=4G
 #$ -l h_vmem=4G
 #$ -l h_rt=9:59:59
+#$ -t 69-136
+
 
 #cvmeth="famaware"
 #cvmeth="standard"
