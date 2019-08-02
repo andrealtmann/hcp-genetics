@@ -37,7 +37,7 @@ for(aa in args){
 
 #convert fs_feat_number into fs_feat
 fs_map <- read.csv("../data/fs_feature_list.csv", row.names=1)
-fs_feat <- fs_map[fs_feat_number,1]
+fs_feat <- paste(fs_map[fs_feat_number,1])
 
 message("options:")
 for(var in c("nparc","cv.method","keep.sex","fs_feat","regress.icv","ceu_cut","nperm"))
