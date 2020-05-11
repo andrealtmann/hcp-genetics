@@ -6,7 +6,9 @@
 #$ -l tmem=4G
 #$ -l h_vmem=4G
 #$ -l h_rt=9:59:59
-#$ -t 69-136
+#$ -t 1-68
+
+## #$ -t 69-136
 
 
 #cvmeth="famaware"
@@ -17,4 +19,4 @@ nparc=$2
 #feature to be worked on based on sge task id in array job (1-68)
 fsfeat=$SGE_TASK_ID
 
-R --no-save -q < cluster_call_FSbenchmark.R --ICVreg=true --sex=both --CEU=0.0 --nperm=50 --fsfn=$fsfeat --nparc=$nparc --cv=$cvmeth
+R --no-save -q < cluster_call_FSbenchmark.R --ICVreg=true --sex=male --CEU=0.0 --nperm=50 --fsfn=$fsfeat --nparc=$nparc --cv=$cvmeth

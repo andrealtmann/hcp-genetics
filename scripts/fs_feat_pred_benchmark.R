@@ -80,6 +80,7 @@ keep.ceu <- rownames(subset(ethn.info[keep,], CEU>=ceu_cut))
 fs2      <- fs.info[keep.ceu, fs_feat]
 if (regress.icv){
   myicv <- fs.info[keep.ceu, "FS_InterCranial_Vol"]
+  message("hello world")
   dummy <- lm(fs2 ~ myicv)
   fs2.bak <- fs2
   dummy2 <- dummy$res

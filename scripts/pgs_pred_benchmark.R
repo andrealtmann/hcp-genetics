@@ -32,7 +32,8 @@ ofname <- paste("../results/", paste("benchmark", cv.method, chip, nparc, pgs, b
 rdata.fname <- list()
 rdata.fname[[1]] <- paste("../data/netmats1_", nparc, ".RData", sep="")
 rdata.fname[[2]] <- paste("../data/netmats2_", nparc, ".RData", sep="")
-pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score_residual",sep="")
+#pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score_residual",sep="")
+pgs.fname   <- paste("../data/",pgs, "/", pgs, "_", chip, ".all.score",sep="")
 fam.fname <- paste("../data/MEGA_Chip.fam")
 
 message("loading ", pgs, " PGS")
@@ -97,8 +98,8 @@ for(rep in 1:nperm){
   }
 
   #nested CV
-  nested.cv.nm1 <- doubleCV(Y2, mydata.scale2.nm1, myfold=mycv, fam="gaussian", measure="mse", lop="min")
-  nested.cv.nm2 <- doubleCV(Y2, mydata.scale2.nm2, myfold=mycv, fam="gaussian", measure="mse", lop="min")
+  nested.cv.nm1 <- doubleCV(Y2, mydata.scale2.nm1, myfold=mycv, fam="gaussian", measure="mse", lop="min", alpha=0)
+  nested.cv.nm2 <- doubleCV(Y2, mydata.scale2.nm2, myfold=mycv, fam="gaussian", measure="mse", lop="min", alpha=0)
 
   xperf <- c(cmp.CV.perf(nested.cv.nm1), cmp.CV.perf(nested.cv.nm2))
   bench <- rbind(bench, xperf)
